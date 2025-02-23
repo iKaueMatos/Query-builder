@@ -2,124 +2,154 @@
 
 ## Descrição
 
-O Query Builder é uma ferramenta poderosa para construir consultas SQL de forma programática. Ele permite criar consultas complexas de maneira simples e intuitiva, sem a necessidade de escrever SQL manualmente.
+O Query Builder é uma ferramenta poderosa para construir consultas SQL de forma programática em Java. Ele permite criar consultas complexas de maneira simples e intuitiva, evitando erros comuns de sintaxe e facilitando a manutenção do código.
 
 ## Funcionalidades
 
-- Construção de consultas SELECT, INSERT, UPDATE e DELETE.
-- Suporte a cláusulas WHERE, JOIN, ORDER BY, GROUP BY e HAVING.
-- Suporte a parâmetros nomeados para evitar SQL Injection.
-- Fácil integração com diversos bancos de dados.
+- Construção de consultas SQL SELECT, INSERT, UPDATE e DELETE.
+- Suporte a cláusulas WHERE, JOIN, ORDER BY, GROUP BY, HAVING, etc.
+- Integração com diferentes bancos de dados.
+- API fluente para construção de consultas.
+
+## Requisitos
+
+- Java 8 ou superior.
+- Biblioteca JDBC para o banco de dados que você deseja utilizar.
 
 ## Instalação
 
-Para instalar o Query Builder, você pode clonar este repositório e instalar as dependências necessárias:
-
-```bash
-git clone https://github.com/seu-usuario/query-builder.git
-cd query-builder
-```
+1. Clone o repositório para o seu ambiente local:
+    ```bash
+    git clone https://github.com/seu-usuario/query-builder.git
+    ```
+2. Adicione o projeto ao seu ambiente de desenvolvimento Java.
 
 ## Utilização
 
-### Importação
+### Exemplo de Uso
 
-Para utilizar o Query Builder, você deve importá-lo no seu projeto:
+Abaixo está um exemplo de como utilizar o Query Builder para construir uma consulta SQL em Java:
 
-```javascript
-const QueryBuilder = require('./caminho/para/query-builder');
+```java
+import com.querybuilder.builder.QueryBuilder;
+import com.querybuilder.Enum.Operator;
+
+public class Main {
+    public static void main(String[] args) {
+        QueryBuilder qb = new QueryBuilder("users");
+
+        String query = qb.select("name", "age")
+                         .where("age", Operator.GREATER_THAN, 18)
+                         .orderBy("name", true)
+                         .build();
+
+        System.out.println(query);
+        // Saída: SELECT name, age FROM users WHERE age > 18 ORDER BY name ASC;
+    }
+}
 ```
 
-### Exemplos de Uso
+### Conectando ao Banco de Dados
 
-#### SELECT
+Para executar a consulta construída, você precisará se conectar ao banco de dados usando JDBC. Veja um exemplo de como fazer isso:
 
-Para construir uma consulta SELECT:
+```java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
-```javascript
-const query = new QueryBuilder()
-  .select(['id', 'nome', 'email'])
-  .from('usuarios')
-  .where('ativo = :ativo', { ativo: true })
-  .orderBy('nome', 'ASC')
-  .build();
+public class DatabaseExample {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/seu_banco_de_dados";
+        String user = "seu_usuario";
+        String password = "sua_senha";
 
-console.log(query);
-// Saída: SELECT id, nome, email FROM usuarios WHERE ativo = true ORDER BY nome ASC
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             Statement stmt = conn.createStatement()) {
+
+            QueryBuilder qb = new QueryBuilder("users");
+            String query = qb.select("name", "age")
+                             .where("age", Operator.GREATER_THAN, 18)
+                             .orderBy("name", true)
+                             .build();
+
+            ResultSet rs = stmt.executeQuery(query);
+
+            while (rs.next()) {
+                System.out.println("Name: " + rs.getString("name") + ", Age: " + rs.getInt("age"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
 ```
 
-#### INSERT
+### Inserindo Dados
 
-Para construir uma consulta INSERT:
+Para inserir dados em uma tabela, você pode usar o método `insertInto` e `set`:
 
-```javascript
-const query = new QueryBuilder()
-  .insert('usuarios', { nome: 'João', email: 'joao@example.com', ativo: true })
-  .build();
+```java
+import com.querybuilder.builder.QueryBuilder;
 
-console.log(query);
-// Saída: INSERT INTO usuarios (nome, email, ativo) VALUES ('João', 'joao@example.com', true)
+public class InsertExample {
+    public static void main(String[] args) {
+        QueryBuilder qb = new QueryBuilder("users");
+
+        String query = qb.insertInto("users")
+                         .set("name", "John Doe")
+                         .set("age", 30)
+                         .build();
+
+        System.out.println(query);
+        // Saída: INSERT INTO users (name, age) VALUES (?, ?);
+    }
+}
 ```
 
-#### UPDATE
+### Atualizando Dados
 
-Para construir uma consulta UPDATE:
+Para atualizar dados em uma tabela, você pode usar o método `update`:
 
-```javascript
-const query = new QueryBuilder()
-  .update('usuarios')
-  .set({ nome: 'João Silva', ativo: false })
-  .where('id = :id', { id: 1 })
-  .build();
+```java
+import com.querybuilder.builder.QueryBuilder;
+import com.querybuilder.Enum.Operator;
 
-console.log(query);
-// Saída: UPDATE usuarios SET nome = 'João Silva', ativo = false WHERE id = 1
+public class UpdateExample {
+    public static void main(String[] args) {
+        QueryBuilder qb = new QueryBuilder("users");
+
+        String query = qb.update("name", "John Doe")
+                         .where("id", Operator.EQUALS, 1)
+                         .build();
+
+        System.out.println(query);
+        // Saída: UPDATE users SET name = ? WHERE id = ?;
+    }
+}
 ```
 
-#### DELETE
+### Deletando Dados
 
-Para construir uma consulta DELETE:
+Para deletar dados de uma tabela, você pode usar o método `delete`:
 
-```javascript
-const query = new QueryBuilder()
-  .delete()
-  .from('usuarios')
-  .where('id = :id', { id: 1 })
-  .build();
+```java
+import com.querybuilder.builder.QueryBuilder;
+import com.querybuilder.Enum.Operator;
 
-console.log(query);
-// Saída: DELETE FROM usuarios WHERE id = 1
-```
+public class DeleteExample {
+    public static void main(String[] args) {
+        QueryBuilder qb = new QueryBuilder("users");
 
-### Parâmetros Nomeados
+        String query = qb.delete()
+                         .where("id", Operator.EQUALS, 1)
+                         .build();
 
-O Query Builder suporta parâmetros nomeados para evitar SQL Injection. Você pode usar parâmetros nomeados nas cláusulas WHERE, SET, etc.:
-
-```javascript
-const query = new QueryBuilder()
-  .select(['id', 'nome'])
-  .from('usuarios')
-  .where('email = :email', { email: 'joao@example.com' })
-  .build();
-
-console.log(query);
-// Saída: SELECT id, nome FROM usuarios WHERE email = 'joao@example.com'
-```
-
-### JOIN
-
-Para construir uma consulta com JOIN:
-
-```javascript
-const query = new QueryBuilder()
-  .select(['u.id', 'u.nome', 'p.nome AS perfil'])
-  .from('usuarios u')
-  .join('perfis p', 'u.perfil_id = p.id')
-  .where('u.ativo = :ativo', { ativo: true })
-  .build();
-
-console.log(query);
-// Saída: SELECT u.id, u.nome, p.nome AS perfil FROM usuarios u JOIN perfis p ON u.perfil_id = p.id WHERE u.ativo = true
+        System.out.println(query);
+        // Saída: DELETE FROM users WHERE id = ?;
+    }
+}
 ```
 
 ## Contribuição
