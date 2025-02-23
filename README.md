@@ -18,7 +18,6 @@ Para instalar o Query Builder, você pode clonar este repositório e instalar as
 ```bash
 git clone https://github.com/seu-usuario/query-builder.git
 cd query-builder
-npm install
 ```
 
 ## Utilização
