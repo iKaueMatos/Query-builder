@@ -1,12 +1,5 @@
 # Query Builder
 
-![GitHub repo size](https://img.shields.io/github/repo-size/seu-usuario/query-builder)
-![GitHub contributors](https://img.shields.io/github/contributors/seu-usuario/query-builder)
-![GitHub stars](https://img.shields.io/github/stars/seu-usuario/query-builder?style=social)
-![GitHub forks](https://img.shields.io/github/forks/seu-usuario/query-builder?style=social)
-![GitHub issues](https://img.shields.io/github/issues/seu-usuario/query-builder)
-![GitHub license](https://img.shields.io/github/license/seu-usuario/query-builder)
-
 ## Descrição
 
 O Query Builder é uma ferramenta poderosa para construir consultas SQL de forma programática. Ele permite criar consultas complexas de maneira simples e intuitiva, sem a necessidade de escrever SQL manualmente.
